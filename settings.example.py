@@ -1,51 +1,26 @@
-# Django settings for nodeshot project.
-
+# Initialize App Engine and import the default settings (DB backend, etc.).
+# If you want to use a different backend you have to remove all occurences
+# of "djangoappengine" from this file.
+from djangoappengine.settings_base import *
 import os
-
+DEVELOPMENT_SERVER = True
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+
+ROOT_URLCONF = 'urls'
+
+TIME_ZONE='America/Los_Angeles'
 
 ADMINS = (
-     ('admin', 'admin@yourdomain.org'),
+     ('<username>', '<admin_email@domain.tld>'),
 )
 
-ORGANIZATION = 'Ninux.org'
+ORGANIZATION = 'Organization Name'
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'db/nodeshot.db',               # Or path to database file if using sqlite3.
-        'USER': 'nodeshot',                     # Not used with sqlite3.
-        'PASSWORD': 'XXXXX',             # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-    }
-}
-
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# On Unix systems, a value of None will cause Django to use the same
-# timezone as the operating system.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
-TIME_ZONE = 'Europe/Rome'
-
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'it-IT'
-
-SITE_ID = 1
-
-# If you set this to False, Django will make some optimizations so as not
-# to load the internationalization machinery.
-USE_I18N = True
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
+SECRET_KEY = '=r-$b*8hglm+858*9t043hlm6-&6-9d3vfc4((7yd0dbrakhvi'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/"
@@ -54,12 +29,14 @@ MEDIA_ROOT = '%s/media/' % os.path.dirname(os.path.realpath(__file__))
 # for django 1.4
 STATIC_ROOT = MEDIA_ROOT
 
-SITE_URL = "http://localhost:8000/"
+## Set SITE_URL to the url of the app engine instance.  For extra security use HTTPS
+SITE_URL = "https://nodeshot-gae.appspot.com/"
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '%smedia/' % SITE_URL
+#MEDIA_URL = '%smedia/' % SITE_URL
+MEDIA_URL = '/media/'
 
 # for django 1.4
 STATIC_URL = MEDIA_URL
@@ -68,82 +45,92 @@ STATIC_URL = MEDIA_URL
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '%sadmin/' % MEDIA_URL
+#ADMIN_MEDIA_PREFIX = '/media/admin/'
 
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = '(i+!)&s9crw*eg^!)(uudsdr%+*+g)(d$fs32eh7a3*z-dd3'
-
-# List of callables that know how to import templates from various sources.
+# From nodeshot settings, and should be tried without being added
 TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
+   'django.template.loaders.filesystem.Loader',
+   'django.template.loaders.app_directories.Loader',
 #     'django.template.loaders.eggs.Loader',
-)
-
-MIDDLEWARE_CLASSES = (
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    # staticgenerator
-    #'staticgenerator.middleware.StaticGeneratorMiddleware'
-)
-
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.auth.context_processors.auth',
-    'django.core.context_processors.debug',
-    'django.core.context_processors.i18n',
-    'django.core.context_processors.media',
-    'django.core.context_processors.static',
-    'django.contrib.messages.context_processors.messages',
-    # nodeshot
-    'nodeshot.context_processors.site'
-)
-
-ROOT_URLCONF = 'urls'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    '%s/nodeshot/templates/' % os.path.dirname(os.path.realpath(__file__))
-)
-
-INSTALLED_APPS = (
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    #'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.admin',
-    'nodeshot',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
 )
 
 # additional information about administrators
 AUTH_PROFILE_MODULE = 'nodeshot.UserProfile'
 
-# If you use the django development server set this to true if you want django to serve static files (check urls.py)
-DEVELOPMENT_SERVER = True
+INSTALLED_APPS = (
+   'django.contrib.admin',
+   'django.contrib.contenttypes',
+   'django.contrib.auth',
+   'django.contrib.sessions',
+   'django.contrib.messages',
+   'djangotoolbox',
+   'permission_backend_nonrel',
+   'nodeshot',
+   # djangoappengine should come last, so it can override a few manage.py commands
+   'djangoappengine',
+)
+
+AUTHENTICATION_BACKENDS = (
+   'permission_backend_nonrel.backends.NonrelPermissionBackend',
+)
+
+MIDDLEWARE_CLASSES = (
+   'django.middleware.common.CommonMiddleware',
+   'django.contrib.sessions.middleware.SessionMiddleware',
+   'django.middleware.csrf.CsrfViewMiddleware',
+   'django.contrib.auth.middleware.AuthenticationMiddleware',
+   'django.contrib.messages.middleware.MessageMiddleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+   'django.contrib.auth.context_processors.auth',
+   'django.core.context_processors.debug',
+   'django.core.context_processors.i18n',
+#    'django.core.context_processors.request',
+   'django.core.context_processors.media',
+   'django.contrib.messages.context_processors.messages',
+   # nodeshot
+   'nodeshot.context_processors.site',
+)
+
+SERIALIZATION_MODULES = {
+   'json': 'wadofstuff.django.serializers.json'
+}
+
+# This test runner captures stdout and associates tracebacks with their
+# corresponding output. Helps a lot with print-debugging.
+TEST_RUNNER = 'djangotoolbox.test.CapturingTestSuiteRunner'
+
+TEMPLATE_DIRS = (
+   '%s/nodeshot/templates/' % os.path.dirname(os.path.realpath(__file__)),
+   os.path.join(os.path.dirname(__file__), 'templates'),
+   os.path.join(os.path.dirname(__file__), 'django/contrib/admin/templates'),
+)
+DBINDEXER_BACKENDS = (
+   'dbindexer.backends.BaseResolver',
+   'dbindexer.backends.FKNullFix',
+   'dbindexer.backends.InMemoryJOINResolver',
+)
+
+####### Nodeshot Configuration ###########
+#
 
 # google map center for nodeshot
-NODESHOT_GMAP_CONFIG = {
-    'lat': '41.8934',
-    'lng': '12.4960',
-    'zoom': 12
+NODESHOT_GMAP_CENTER = {
+    'lat': '47.6063889',
+    'lng': '-122.3308333'
 }
 
 # site name and domain, this is needed for email notifications We wanted to avoid using Django's sites framework
 NODESHOT_SITE = {
-    'name': 'Nodeshot',
-    'domain': 'domain.com'
+    'name': 'seattlemesh.net',
+    'domain': 'seattlemeshnet-nodeshot.appspot.com'
 }
 
 # this setting is used in the generation of KML file
 NODESHOT_KML = {
     'name': NODESHOT_SITE['name'],
-    'description': 'KML feed generated by Nodeshot.'
+    'description': 'KML feed for seattlemesh.net generated by Nodeshot.'
 }
 
 # routing protocols used in nodeshot.models
@@ -165,7 +152,7 @@ NODESHOT_DEFAULT_ROUTING_PROTOCOL = 'olsr'
 # maximum number of days to activate a new node until is purged (automatic purging needs a cronjob to be set on the server)
 NODESHOT_ACTIVATION_DAYS = 7
 # log messages sent with contact form
-NODESHOT_LOG_CONTACTS = False
+NODESHOT_LOG_CONTACTS = True
 
 _ = lambda s: s
 
@@ -178,7 +165,7 @@ NODESHOT_FRONTEND_SETTINGS = {
     'TAB3': 'OLSR',
     'TAB4': 'VPN',
     'WELCOME_TEXT': _('Welcome to Nodeshot!'),
-    'LINK_QUALITY': 'etx' # nometric, dbm, etx
+    'LINK_QUALITY': 'etx' # dbm, etx
 }
 
 EMAIL_USE_TLS = True
@@ -186,25 +173,27 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'youremail@gmail.com'
 EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
-DEFAULT_FROM_EMAIL = 'youremail@gmail.com'
+# Ensure that the domain is in the form of app-name.appspotmail.com or notifications will fail to be sent
+DEFAULT_FROM_EMAIL = 'noreply@seattlemeshnet-nodeshot.appspotmail.com'
 
 # captcha settings
-MATH_CAPTCHA_NUMBERS = range(1,9)
+MATH_CAPTCHA_NUMBERS = range(1,999)
 MATH_CAPTCHA_OPERATORS = '+'
 MATH_CAPTCHA_QUESTION = _('Antispam question: what is the sum of')
 
-# static generator
-# to activate static generator follow instructions here http://superjared.com/projects/static-generator/
-WEB_ROOT = '/var/www/nodeshot/' # you need to change this with your public folder
-STATIC_GENERATOR_URLS = (
-    r'^/$',
-    r'^/overview/$',
-    r'^/select',
-    r'^/nodes.json$',
-    r'^/jstree.json$',
-    r'^/search',
-    r'^/node/info',
-    r'^/node/advanced',
-    r'^/tab',
-    r'^/nodes.kml$',
-)
+
+
+#
+####### End Nodeshot Configuration #######
+
+# Activate django-dbindexer if available
+try:
+    import dbindexer
+    DATABASES['native'] = DATABASES['default']
+    DATABASES['default'] = {'ENGINE': 'dbindexer', 'TARGET': 'native'}
+    INSTALLED_APPS += ('dbindexer',)
+    DBINDEXER_SITECONF = 'dbindexes'
+    MIDDLEWARE_CLASSES = ('dbindexer.middleware.DBIndexerMiddleware',) + \
+                         MIDDLEWARE_CLASSES
+except ImportError:
+   pass

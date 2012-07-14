@@ -1,0 +1,8 @@
+To create the initial account, you must edit the bootstrap.py script with the admin user account information.
+
+Once this is set, you can execute the url /bootstrap (see app.yaml) to create the initial admin user in the database. 
+Once you have this you can login and administer the system.
+The /bootstrap url will only create a user if there are 0 users in the system.  This will prevent abuse.  For extra security, remove the entry in the app.yaml 
+
+
+

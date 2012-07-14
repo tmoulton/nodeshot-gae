@@ -1,0 +1,11 @@
+cron:
+- description: keep alive
+  url: /
+  schedule: every 2 minutes
+
+- description: purge expired nodes
+  url: /cron/purge_expired/
+  schedule: every 24 hours
+#- description: process tags
+#  url: /tracker/process_tags
+#  schedule: every 5 minutes
